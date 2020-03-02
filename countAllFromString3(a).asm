@@ -5,165 +5,151 @@ INCLUDE 'EMU8086.INC'
 
 VL DB 0
 CNS DB 0
-NUMBER DB 0
 SPACE DB 0
-OTHER DB 0
-
+DIGITS DB 0
+OTHERS DB 0
 .CODE
-
 MOV AX,@DATA
-MOV DS,AX 
-
-MAIN PROC
+MOV DS,AX
+MAIN PROC 
     
     MOV VL,0
     MOV CNS,0
-    MOV NUMBER,0
+    MOV DIGITS,0
     MOV SPACE,0
-    MOV OTHER,0
-    
+    MOV OTHERS,0
+  
     MOV AH,1
-    NEXT:
+    FOR:
         INT 21H
         CMP AL,0DH
-        JZ OUTPUT
-        
-        CMP AL,'A'
-        JL OTHERS
-        CMP AL, 'z'
-        JG OTHERS
-        
-        JMP CHAR
-        
-   CHAR:
-        CMP AL,'A'
-        JZ VOWEL
-        
-        CMP AL,'E'
-        JZ VOWEL
-        
-        CMP AL,'I'
-        JZ VOWEL
-        
-        CMP AL,'O'
-        JZ VOWEL
-        
-        CMP AL,'U'
-        JZ VOWEL
-        
-        CMP AL,'a'
-        JZ VOWEL
-        
-        CMP AL,'e'
-        JZ VOWEL
-        
-        CMP AL,'i'
-        JZ VOWEL
-        
-        CMP AL,'o'
-        JZ VOWEL
-        
-        CMP AL,'u'
-        JZ VOWEL
-        
-        JMP CONST
-        
-    VOWEL:
-          INC VL
-          JMP NEXT
-          
-    CONST:
-          INC CNS
-          JMP NEXT
-          
-    OTHERS:
-           CMP AL,' '
-           JNE SPECIAL
-           INC SPACE
-           JMP NEXT
+        JZ END_FOR 
+       
+       IF:
+           CMP AL,65
+           JL ELSEIF2
            
-    SPECIAL:
-            CMP AL,'0'
-            JL ALL
-            CMP AL,'9'
-            JG ALL
-            INC NUMBER
-            JMP NEXT
-            
-     ALL:
-            INC OTHER
-            JMP NEXT
-            
-     OUTPUT:
-            MOV AH,2
-            MOV DL,0AH
-            INT 21H
-            MOV DL,0DH
-            INT 21H
-            
-            ADD VL,48
-            PRINTN
-            PRINT 'VOWEL: '
-            MOV DL,VL
-            INT 21H
+           CMP AL,122
+           JG ELSEIF2
            
-            MOV DL, 0AH
-            INT 21H
-            MOV DL, 0DH
-            INT 21H
+           
+       ELSEIF:
+         
             
+            CMP AL,'A'
+            JZ VOWEL
+            CMP AL,'E'
+            JZ VOWEL
+            CMP AL,'I'
+            JZ VOWEL
+            CMP AL,'O'
+            JZ VOWEL
+            CMP AL,'U'
+            JZ VOWEL
             
-            ADD CNS,48
-            PRINTN
-            PRINT 'CONSONENT: '
-            MOV DL,CNS
-            INT 21H
+            CMP AL,'a'
+            JZ VOWEL
+            CMP AL,'e'
+            JZ VOWEL
+            CMP AL,'i'
+            JZ VOWEL
+            CMP AL,'o'
+            JZ VOWEL
+            CMP AL,'u'
+            JZ VOWEL
+             
+            CMP AL,97
+            JG CONS2 
             
-            MOV DL, 0AH
-            INT 21H
-            MOV DL, 0DH
-            INT 21H
+         CONS1:
+               CMP AL,90
+               JG ELSEIF2 
             
-            ADD NUMBER,48
-            PRINTN
-            PRINT 'NUMBERS: '
-            MOV DL,NUMBER
-            INT 21H
+         CONS2:
+         
+             INC CNS
+            JMP FOR
             
-            MOV DL, 0AH
-            INT 21H
-            MOV DL, 0DH
-            INT 21H
-            
-            ADD SPACE,48
-            PRINTN
-            PRINT 'SPACES: '
-            MOV DL,SPACE
-            INT 21H
-            
-            MOV DL, 0AH
-            INT 21H
-            MOV DL, 0DH
-            INT 21H
-            
-            ADD OTHER,48
-            PRINTN
-            PRINT 'OTHERS: '
-            MOV DL,OTHER
-            INT 21H
-            
-            MOV DL, 0AH
-            INT 21H
-            MOV DL, 0DH
-            INT 21H
-            
-            MOV AH,4CH
-            INT 21H
-            
-     MAIN ENDP
-     END MAIN
-            
-            
-                                             
+       VOWEL:
+            INC VL
+            JMP FOR     
+             
+       ELSEIF2:
+               CMP AL,' '
+               JZ SPC 
+               CMP AL,48
+               JL ELSE
+               CMP AL,56
+               JG ELSE
+               INC DIGITS
+               JMP FOR
         
+        ELSE:
+              INC OTHERS
+              JMP FOR
+                     
+        SPC:
+            INC SPACE
+            JMP FOR
             
+        END_FOR:
+                MOV AH,2
+                MOV DL,0AH
+                INT 21H
+                MOV DL,0DH
+                INT 21H
+                
+        RESULT:
+               MOV AH,2
+               PRINT 'NUMBER  OF VOWELS: '
+               ADD VL,48
+               MOV DL,VL
+               INT 21H
+                
+                MOV DL,0AH
+                INT 21H
+                MOV DL,0DH
+                INT 21H 
+                
+                PRINT 'NUMBER  OF CONSONANTS: '
+                ADD CNS,48
+               MOV DL,CNS
+               INT 21H
+               
+                MOV DL,0AH
+                INT 21H
+                MOV DL,0DH
+                INT 21H
+                
+                
+                PRINT 'NUMBER  OF DIGITS: '
+               ADD DIGITS,48
+               MOV DL,DIGITS
+               INT 21H
+               
+                MOV DL,0AH
+                INT 21H
+                MOV DL,0DH
+                INT 21H
+                
+                
+               PRINT 'NUMBER  OF OTHERS: '
+               ADD OTHERS,48
+               MOV DL,OTHERS
+               INT 21H
+               
+                MOV DL,0AH
+                INT 21H
+                MOV DL,0DH
+                INT 21H
+                
+                PRINT 'NUMBER  OF SPACES: '
+                ADD SPACE,48
+               MOV DL,SPACE
+               INT 21H            
+        END:
+        MOV AH,4CH
+        INT 21H
+        MAIN ENDP
+END MAIN
+        
